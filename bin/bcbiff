@@ -41,7 +41,7 @@ IDCACHE_FILE = '~/Maildir/idcache.%s.yml'
 IDCACHE_SIZE = 100
 BCBIFF_FILE  = '~/.bcbiff'
 
-def main
+def main(argv)
   YAML.load_file(File.expand_path(BCBIFF_FILE)).each { |options|
     check_mails(options)
   }
