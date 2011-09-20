@@ -58,12 +58,16 @@ missing.
 
 ## SEE ALSO
 
-* [Gmail](https://mail.google.com/)
-
 * [Boxcar](http://boxcar.io/)
+
+* [Gmail](https://mail.google.com/)
 
 ## AUTHOR
 
 Copyright (c) 2011 Akinori MUSHA.
 
-See `LICENSE.txt` for further details.
+Licensed under the 2-clause BSD license.  See `LICENSE.txt` for
+details.
+
+Visit [GitHub Repository](https://github.com/knu/bcbiff) for the
+latest information.
