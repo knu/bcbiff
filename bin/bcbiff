@@ -34,7 +34,7 @@ require 'yaml'
 require 'mail'
 require 'shellwords'
 
-VERSION = '0.1.0'
+BCBIFF_VERSION = '0.1.1'
 
 CERTS_PATH   = '/etc/ssl/cert.pem'
 IDCACHE_FILE = '~/Maildir/idcache.%s.yml'
@@ -49,17 +49,17 @@ end
 
 def check_mails(options)
   #Net::IMAP.debug = true
-  imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], CERTS_PATH, true)
-  imap.login(options[:username], options[:password])
-  imap.select('Inbox')
-  unseen = imap.search('UNSEEN')
-  return if unseen.empty?
-
   mailto = options[:mailto]
   msgids_file = File.expand_path(IDCACHE_FILE % mailto)
 
   File.open(msgids_file, File.exist?(msgids_file) ? 'r+' : 'w+') { |f|
     f.flock(File::LOCK_EX | File::LOCK_NB) or break
+
+    imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], CERTS_PATH, true)
+    imap.login(options[:username], options[:password])
+    imap.select('Inbox')
+    unseen = imap.search('UNSEEN')
+    return if unseen.empty?
 
     msgids = YAML.load(f) || []
 
