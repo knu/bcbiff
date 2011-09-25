@@ -56,6 +56,10 @@ Bcbiff will run with Ruby 1.8.7+ and 1.9.2+.
 See `Gemfile` for dependency.  Run `bundle install` to install what's
 missing.
 
+Bcbiff calls the `sendmail` command to send a mail.  Sendmail (or any
+compatible software such as Qmail or Postfix) must be properly
+configured.
+
 ## SEE ALSO
 
 * [Boxcar](http://boxcar.io/)
