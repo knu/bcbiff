@@ -11,7 +11,7 @@
 ## DESCRIPTION
 
 Bcbiff checks the Inbox folder on an IMAP server for unread mails and
-sends a notification for each.
+sends a notification mail for each.
 
 This tool was made to send push notification to your iPhone via Boxcar
 when you have received a mail in Inbox on an IMAP server, primarily
@@ -60,6 +60,10 @@ unread despite a notification.
     specify them in the `:folders` field, in which case you need to
     specify `Inbox` if you want it checked.
 
+* `~/Maildir/idcache.*.yml`
+
+    Message-Id cache files, one for each notification account.
+
 ## USAGE
 
 Prepare your `~/.bcbiff`, adjust constants defined in `bcbiff` for
@@ -76,6 +80,12 @@ Bcbiff calls the `sendmail` command to send a mail.  Sendmail (or any
 compatible software such as qmail or Postfix) must be properly
 configured.
 
+To use SSL connections, you must have the certificates file/directory
+configured.  Some of the common paths are determined by default, but
+if bcbiff(1) fails to locate the one on your system, follow the
+instruction displayed, and let me know if it's pretty much common on
+the platform.
+
 ## SEE ALSO
 
 * [Boxcar](http://boxcar.io/)
@@ -90,4 +100,4 @@ Licensed under the 2-clause BSD license.  See `LICENSE.txt` for
 details.
 
 Visit [GitHub Repository](https://github.com/knu/bcbiff) for the
-latest information.
+latest information and feedback.
