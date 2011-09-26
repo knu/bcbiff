@@ -34,7 +34,7 @@ require 'yaml'
 require 'mail'
 require 'shellwords'
 
-BCBIFF_VERSION = '0.2.0'
+BCBIFF_VERSION = '0.2.1'
 
 CERTS_PATHS   = [
   '/etc/ssl/cert.pem',		# FreeBSD
@@ -129,34 +129,35 @@ def check_mails(options)
   File.open(msgids_file, File::RDWR | File::CREAT, 0600) {|f|
     f.flock(File::LOCK_EX | File::LOCK_NB) or break
 
+    msgids = YAML.load(f) || []
+
     imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], certs_path, true)
     imap.login(options[:username], options[:password])
     folders = options[:folders] || ['Inbox']
-    unseen = folders.inject([]) { |unseen, folder|
+
+    folders.each { |folder|
       imap.select(folder)
-      unseen.concat(imap.search('UNSEEN'))
-    }
-    return if unseen.empty?
+      unseen = imap.search('UNSEEN')
+      next if unseen.empty?
 
-    msgids = YAML.load(f) || []
+      imap.fetch(unseen, item = 'RFC822.HEADER').each { |data|
+        mail = Mail.read_from_string(data.attr[item])
+        msgid = mail.message_id
+        next if msgids.include?(msgid)
+        msgids << msgid
 
-    imap.fetch(unseen, item = 'RFC822.HEADER').each { |data|
-      mail = Mail.read_from_string(data.attr[item])
-      msgid = mail.message_id
-      next if msgids.include?(msgid)
-      msgids << msgid
+        (header = mail.header).fields.each { |field|
+          case name = field.name
+          when /\A(From|Subject|Date)\z/i
+            # preserve
+          else
+            header[name] = nil
+          end
+        }
 
-      (header = mail.header).fields.each { |field|
-        case name = field.name
-        when /\A(From|Subject|Date)\z/i
-          # preserve
-        else
-          header[name] = nil
-        end
-      }
-
-      open("| sendmail #{mailto.shellescape}", 'w') { |sendmail|
-        sendmail.print mail.encoded
+        open("| sendmail #{mailto.shellescape}", 'w') { |sendmail|
+          sendmail.print mail.encoded
+        }
       }
     }
     msgids.slice!(0...-IDCACHE_SIZE) if msgids.size > IDCACHE_SIZE
