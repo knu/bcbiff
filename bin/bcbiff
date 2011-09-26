@@ -42,9 +42,33 @@ IDCACHE_SIZE = 100
 BCBIFF_FILE  = '~/.bcbiff'
 
 def main(argv)
-  YAML.load_file(File.expand_path(BCBIFF_FILE)).each { |options|
+  accounts = config[:accounts]
+
+  accounts.each { |options|
     check_mails(options)
   }
+end
+
+def config
+  $config ||=
+    begin
+      value = YAML.load_file(File.expand_path(BCBIFF_FILE))
+      raise unless value.is_a?(Hash) && value.key?(:accounts)
+      value
+    end
+rescue
+  STDERR.puts "Put your configuration in #{BCBIFF_FILE} that looks like below.", ''
+  STDERR.print YAML.dump({
+    :accounts => [
+      :host => 'imap.gmail.com',
+      :port => 993,
+      :ssl  => true,
+      :username => 'you@your.domain',
+      :password => 's0m3pa55w0rd',
+      :mailto => 'notifi.cation@push.boxcar.io',
+    ]
+  })
+  exit
 end
 
 def check_mails(options)
