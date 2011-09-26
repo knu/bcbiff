@@ -73,9 +73,6 @@ your system and run bcbiff once a minute or so.
 
 Bcbiff will run with Ruby 1.8.7+ and 1.9.2+.
 
-See `Gemfile` for dependency.  Run `bundle install` to install what's
-missing.
-
 Bcbiff calls the `sendmail` command to send a mail.  Sendmail (or any
 compatible software such as qmail or Postfix) must be properly
 configured.
@@ -85,6 +82,10 @@ configured.  Some of the common paths are determined by default, but
 if bcbiff(1) fails to locate the one on your system, follow the
 instruction displayed, and let me know if it's pretty much common on
 the platform.
+
+## INSTALLATION
+
+`gem install bcbiff`
 
 ## SEE ALSO
 
