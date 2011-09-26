@@ -52,7 +52,7 @@ def check_mails(options)
   mailto = options[:mailto]
   msgids_file = File.expand_path(IDCACHE_FILE % mailto)
 
-  File.open(msgids_file, File.exist?(msgids_file) ? 'r+' : 'w+') { |f|
+  File.open(msgids_file, File::RDWR | File::CREAT, 0600) {|f|
     f.flock(File::LOCK_EX | File::LOCK_NB) or break
 
     imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], CERTS_PATH, true)
