@@ -54,12 +54,25 @@ def main(argv)
   if accounts.any? { |account| account[:ssl] } && !certs_path
     STDERR.print <<-EOS
 The system path for SSL certificates is not found.
-Add `:certs_path: /path/to/certs` to #{BCBIFF_FILE} or install
-SSL certificates in one of the following locations:
+Install SSL certificates in one of the following locations:
     EOS
     CERTS_PATHS.each { |path|
       STDERR.puts "\t#{path}"
     }
+    STDERR.print <<-EOS if RUBY_PLATFORM =~ /darwin/
+
+If you are on OS X and have MacPorts installed, running the
+following command is an easy way to have one installed:
+\tport install curl-ca-bundle
+    EOS
+    STDERR.print <<-EOS
+
+Otherwise, refer to the following site and place the pem
+file somewhere:
+\thttp://curl.haxx.se/docs/caextract.html
+
+Then add `:certs_path: /path/to/pem` to #{BCBIFF_FILE}.
+    EOS
     exit 1
   end
 
