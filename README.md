@@ -31,16 +31,17 @@ sensitive header fields will be leaked.  Bcbiff solves both.
     User configuration file that would look like below.
 
         ---
+        :accounts:
         - :host: imap.gmail.com
           :port: 993
           :ssl: true
-          :username: "********"
+          :username: "account1"
           :password: "********"
           :mailto: "******.*******@push.boxcar.io"
         - :host: imap.gmail.com
           :port: 993
           :ssl: true
-          :username: "********"
+          :username: "account2@your.domain"
           :password: "********"
           :mailto: "******.*******@push.boxcar.io"
 
