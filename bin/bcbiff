@@ -36,13 +36,31 @@ require 'shellwords'
 
 BCBIFF_VERSION = '0.1.1'
 
-CERTS_PATH   = '/etc/ssl/cert.pem'
+CERTS_PATHS   = [
+  '/etc/ssl/cert.pem',		# FreeBSD
+  '/etc/ssl/certs',		# Ubuntu
+  '/usr/share/ssl/certs',	# RHEL4
+  '/etc/pki/tls/certs',		# RHEL5
+]
+CERTS_PATH   = CERTS_PATHS.find { |f| File.exist?(f) }
 IDCACHE_FILE = '~/Maildir/idcache.%s.yml'
 IDCACHE_SIZE = 100
 BCBIFF_FILE  = '~/.bcbiff'
 
 def main(argv)
   accounts = config[:accounts]
+
+  if !certs_path
+    STDERR.print <<-EOS
+The system path for SSL certificates is not found.
+Add `:certs_path: /path/to/certs` to #{BCBIFF_FILE} or install
+SSL certificates in one of the following locations:
+    EOS
+    CERTS_PATHS.each { |path|
+      STDERR.puts "\t#{path}"
+    }
+    exit 1
+  end
 
   accounts.each { |options|
     check_mails(options)
@@ -65,10 +83,14 @@ rescue
       :ssl  => true,
       :username => 'you@your.domain',
       :password => 's0m3pa55w0rd',
-      :mailto => 'notifi.cation@push.boxcar.io',
+      :mailto => 'n0tifi.cati0n@push.boxcar.io',
     ]
   })
-  exit
+  exit 1
+end
+
+def certs_path
+  $certs_path ||= config[:certs_path] || CERTS_PATH
 end
 
 def check_mails(options)
@@ -79,7 +101,7 @@ def check_mails(options)
   File.open(msgids_file, File::RDWR | File::CREAT, 0600) {|f|
     f.flock(File::LOCK_EX | File::LOCK_NB) or break
 
-    imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], CERTS_PATH, true)
+    imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], certs_path, true)
     imap.login(options[:username], options[:password])
     imap.select('Inbox')
     unseen = imap.search('UNSEEN')
