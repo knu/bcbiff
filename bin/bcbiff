@@ -78,12 +78,23 @@ rescue
   STDERR.puts "Put your configuration in #{BCBIFF_FILE} that looks like below.", ''
   STDERR.print YAML.dump({
     :accounts => [
-      :host => 'imap.gmail.com',
-      :port => 993,
-      :ssl  => true,
-      :username => 'you@your.domain',
-      :password => 's0m3pa55w0rd',
-      :mailto => 'n0tifi.cati0n@push.boxcar.io',
+        {
+          :host => 'imap.gmail.com',
+          :port => 993,
+          :ssl  => true,
+          :username => 'your.account',
+          :password => 'password1',
+          :mailto => 'dead.beef@push.boxcar.io',
+        },
+        {
+          :host => 'imap.gmail.com',
+          :port => 993,
+          :ssl  => true,
+          :username => 'you@your.domain',
+          :password => 'password2',
+          :mailto => 'feed.babe@push.boxcar.io',
+          :folders => %w[Inbox work/important],
+        }
     ]
   })
   exit 1
@@ -103,8 +114,11 @@ def check_mails(options)
 
     imap = Net::IMAP.new(options[:host], options[:port], options[:ssl], certs_path, true)
     imap.login(options[:username], options[:password])
-    imap.select('Inbox')
-    unseen = imap.search('UNSEEN')
+    folders = options[:folders] || ['Inbox']
+    unseen = folders.inject([]) { |unseen, folder|
+      imap.select(folder)
+      unseen.concat(imap.search('UNSEEN'))
+    }
     return if unseen.empty?
 
     msgids = YAML.load(f) || []
