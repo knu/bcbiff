@@ -51,7 +51,7 @@ BCBIFF_FILE  = '~/.bcbiff'
 def main(argv)
   accounts = config[:accounts]
 
-  if !certs_path
+  if accounts.any? { |account| account[:ssl] } && !certs_path
     STDERR.print <<-EOS
 The system path for SSL certificates is not found.
 Add `:certs_path: /path/to/certs` to #{BCBIFF_FILE} or install
