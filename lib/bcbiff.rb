@@ -41,6 +41,7 @@ CERTS_PATHS   = [
   '/etc/ssl/certs',		# Ubuntu
   '/usr/share/ssl/certs',	# RHEL4
   '/etc/pki/tls/certs',		# RHEL5
+  '/opt/local/share/curl/curl-ca-bundle.crt',	# OS X; MacPorts
 ]
 CERTS_PATH   = CERTS_PATHS.find { |f| File.exist?(f) }
 IDCACHE_FILE = '~/Maildir/idcache.%s.yml'
