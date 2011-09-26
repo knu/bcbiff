@@ -51,6 +51,9 @@ BCBIFF_FILE  = '~/.bcbiff'
 def main(argv)
   accounts = config[:accounts]
 
+  maildir = File.dirname(File.expand_path(IDCACHE_FILE))
+  Dir.mkdir(maildir, 0700) unless File.directory?(maildir)
+
   if accounts.any? { |account| account[:ssl] } && !certs_path
     STDERR.print <<-EOS
 The system path for SSL certificates is not found.
