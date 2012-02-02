@@ -146,8 +146,8 @@ def check_mails(options)
         next if msgids.include?(msgid)
         msgids << msgid
 
-        (header = mail.header).fields.each { |field|
-          case name = field.name
+        (header = mail.header).fields.map(&:name).each { |name|
+          case name
           when /\A(From|Subject|Date)\z/i
             # preserve
           else
