@@ -3,7 +3,7 @@
 #
 # bcbiff(1) - Boxcar based IMAP biff
 #
-# Copyright (c) 2011 Akinori MUSHA
+# Copyright (c) 2011, 2012 Akinori MUSHA
 #
 # All rights reserved.
 #
@@ -28,6 +28,12 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
+if defined?(Encoding)
+  Encoding.default_external = Encoding::UTF_8
+else
+  $KCODE = 'u'
+end
+
 require 'rubygems'
 require 'net/imap'
 require 'yaml'
@@ -47,6 +53,7 @@ CERTS_PATH   = CERTS_PATHS.find { |f| File.exist?(f) }
 IDCACHE_FILE = '~/Maildir/idcache.%s.yml'
 IDCACHE_SIZE = 100
 BCBIFF_FILE  = '~/.bcbiff'
+ADDRESSES_FILE = '~/.addresses'
 
 def main(argv)
   accounts = config[:accounts]
@@ -78,6 +85,8 @@ Then add `:certs_path: /path/to/pem` to #{BCBIFF_FILE}.
     EOS
     exit 1
   end
+
+  read_addresses
 
   accounts.each { |options|
     check_mails(options)
@@ -121,6 +130,34 @@ def certs_path
   $certs_path ||= config[:certs_path] || CERTS_PATH
 end
 
+def read_addresses
+  $display_address = {}
+
+  begin
+    content = File.read(ADDRESSES_FILE)
+  rescue
+    return
+  end
+
+  content.each_line { |line|
+    line.chomp!
+    address, nickname, fullname = line.split("\t").map { |field|
+      if m = field.match(/\A"(.*)"\z/)
+        m[1].gsub(/\\(.)/, "\\1")
+      else
+        field
+      end
+    }
+    begin
+      addr = Mail::Address.new(address)
+      addr.display_name = nickname
+      $display_address[address.downcase] = addr.to_s
+    rescue
+    end
+  }
+rescue
+end
+
 def check_mails(options)
   #Net::IMAP.debug = true
   mailto = options[:mailto]
@@ -155,9 +192,18 @@ def check_mails(options)
           end
         }
 
-        open("| sendmail #{mailto.shellescape}", 'w') { |sendmail|
-          sendmail.print mail.encoded
-        }
+        mail.from = mail[:from].field.addrs.map { |addr|
+          $display_address[addr.address.downcase] || addr.to_s
+        }.join(', ')
+
+        begin
+          encoded = mail.encoded
+          open("| sendmail #{mailto.shellescape}", 'w') { |sendmail|
+            sendmail.print encoded
+          }
+        rescue => e
+          STDERR.puts "%s: %s" % [msgid, e.message]
+        end
       }
     }
     msgids.slice!(0...-IDCACHE_SIZE) if msgids.size > IDCACHE_SIZE
