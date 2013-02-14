@@ -40,7 +40,7 @@ require 'yaml'
 require 'mail'
 require 'shellwords'
 
-BCBIFF_VERSION = '0.2.1'
+BCBIFF_VERSION = '0.3.0'
 
 CERTS_PATHS   = [
   '/etc/ssl/cert.pem',		# FreeBSD
