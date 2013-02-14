@@ -3,7 +3,7 @@
 #
 # bcbiff(1) - Boxcar based IMAP biff
 #
-# Copyright (c) 2011, 2012 Akinori MUSHA
+# Copyright (c) 2011, 2012, 2013 Akinori MUSHA
 #
 # All rights reserved.
 #

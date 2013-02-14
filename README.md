@@ -95,7 +95,7 @@ the platform.
 
 ## AUTHOR
 
-Copyright (c) 2011 Akinori MUSHA.
+Copyright (c) 2011, 2012, 2013 Akinori MUSHA.
 
 Licensed under the 2-clause BSD license.  See `LICENSE.txt` for
 details.
